@@ -1,7 +1,6 @@
 package com.whisper.whispme.activities;
 
 import android.content.Intent;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,17 +21,16 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        emailTextInputEditText = (TextInputEditText) findViewById(R.id.emailTextInputEditText);
+        emailTextInputEditText = (TextInputEditText) findViewById(R.id.usernameInputEditText);
         passwordInputEditText = (TextInputEditText) findViewById(R.id.passwordInputEditText);
 
         createAccountTextView = (TextView) findViewById(R.id.createAccountTextView);
         createAccountTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(
-                        new Intent(LoginActivity.this,
-                                SignUpActivity.class));
-                finish();
+                startActivity(new Intent(
+                        LoginActivity.this,
+                        SignUpActivity.class));
             }
         });
 
@@ -40,10 +38,9 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(
-                        new Intent(LoginActivity.this,
-                                SignUpActivity.class));
-                finish();
+                startActivity(new Intent(
+                        LoginActivity.this,
+                        SignUpActivity.class));
             }
         });
 
@@ -51,10 +48,9 @@ public class LoginActivity extends AppCompatActivity {
         loginFacebookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(
-                        new Intent(LoginActivity.this,
-                                SignUpActivity.class));
-                finish();
+                startActivity(new Intent(
+                        LoginActivity.this,
+                        SignUpActivity.class));
             }
         });
 
@@ -62,10 +58,9 @@ public class LoginActivity extends AppCompatActivity {
         loginGoogleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(
-                        new Intent(LoginActivity.this,
-                                SignUpActivity.class));
-                finish();
+                startActivity(new Intent(
+                        LoginActivity.this,
+                        SignUpActivity.class));
             }
         });
 

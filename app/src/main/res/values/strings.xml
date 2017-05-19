@@ -5,4 +5,5 @@
     <string name="login_facebook_button">Facebook</string>
     <string name="login_google_button">Google</string>
     <string name="create_account_text">Create an account or log in with</string>
+    <string name="sign_up_button">Sign up</string>
 </resources>
