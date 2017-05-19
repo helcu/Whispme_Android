@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Whispme</string>
+    <string name="title_activity_splash2">Splash2Activity</string>
 </resources>
