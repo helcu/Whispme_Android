@@ -8,4 +8,6 @@
     <string name="sign_up_button">Sign up</string>
     <string name="title_activity_main_view_maps">Map</string>
     <string name="title_activity_main_view">MainViewActivity</string>
+    <string name="title_activity_new_whisp">NewWhispActivity</string>
+    <string name="title_activity_new_whisp_recorded">NewWhispRecordedActivity</string>
 </resources>
