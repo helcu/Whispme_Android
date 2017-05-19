@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Whispme</string>
-    <string name="title_activity_splash2">Splash2Activity</string>
+    <string name="login_title">Login</string>
+    <string name="login_button">Login</string>
+    <string name="login_facebook_button">Facebook</string>
+    <string name="login_google_button">Google</string>
+    <string name="create_account_text">Create an account or log in with</string>
 </resources>
