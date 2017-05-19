@@ -41,7 +41,11 @@
 
         <activity
             android:name=".activities.MainViewMapsActivity"
-            android:label="@string/title_activity_main_view_maps"></activity>
+            android:label="@string/title_activity_main_view_maps" />
+        <activity
+            android:name=".activities.MainViewActivity"
+            android:label="@string/title_activity_main_view"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
