@@ -10,57 +10,50 @@ import android.widget.TextView;
 
 import com.whisper.whispme.R;
 
-public class LoginActivity extends AppCompatActivity {
+public class SignInActivity extends AppCompatActivity {
 
     TextInputEditText emailTextInputEditText, passwordInputEditText;
-    TextView createAccountTextView;
     Button loginButton, loginFacebookButton, loginGoogleButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_sign_in);
 
         emailTextInputEditText = (TextInputEditText) findViewById(R.id.usernameInputEditText);
+        emailTextInputEditText.requestFocus();
         passwordInputEditText = (TextInputEditText) findViewById(R.id.passwordInputEditText);
 
-        createAccountTextView = (TextView) findViewById(R.id.createAccountTextView);
-        createAccountTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(
-                        LoginActivity.this,
-                        SignUpActivity.class));
-            }
-        });
-
-        loginButton = (Button) findViewById(R.id.loginButton);
+        loginButton = (Button) findViewById(R.id.signInButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(
-                        LoginActivity.this,
-                        MainViewActivity.class));
+
+                // TODO request username and password validation to backend
+
+                gotoMainViewActivity();
             }
         });
 
-        loginFacebookButton = (Button) findViewById(R.id.loginFacebookButton);
+        loginFacebookButton = (Button) findViewById(R.id.signInFacebookButton);
         loginFacebookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(
-                        LoginActivity.this,
-                        SignUpActivity.class));
+
+                // TODO request Google token to backend
+
+                gotoMainViewActivity();
             }
         });
 
-        loginGoogleButton = (Button) findViewById(R.id.loginGoogleButton);
+        loginGoogleButton = (Button) findViewById(R.id.signInGoogleButton);
         loginGoogleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(
-                        LoginActivity.this,
-                        SignUpActivity.class));
+
+                // TODO request Google token to backend
+
+                gotoMainViewActivity();
             }
         });
 
@@ -68,6 +61,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
+    private void gotoMainViewActivity() {
+        Intent intent = new Intent(SignInActivity.this,
+                MainViewActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+        finish();
+    }
 
 
 }

@@ -1,5 +1,6 @@
 package com.whisper.whispme.activities;
 
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -47,6 +48,11 @@ public class NewWhispRecordedActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // TODO Create whisp
+
+
+                startActivity(new Intent(
+                        NewWhispRecordedActivity.this,
+                        MainViewActivity.class));
 
             }
         });

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.whisper.whispme.activities.SignUpActivity">
+    android:background="@drawable/background_main_activity2"
+    tools:context="com.whisper.whispme.activities.SignInActivity">
 
     <ImageView
         android:id="@+id/logoWhispmeImageView"
@@ -34,7 +35,7 @@
         android:layout_marginRight="8dp"
         android:paddingTop="54dp"
         android:textColorHint="@color/colorText"
-        app:layout_constraintBottom_toTopOf="@+id/emailInputLayout"
+        app:layout_constraintBottom_toTopOf="@+id/passwordInputLayout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
 
@@ -56,35 +57,6 @@
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/emailInputLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:textColorHint="@color/colorText"
-        app:layout_constraintBottom_toTopOf="@+id/passwordInputLayout"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="@+id/backgroundImageView">
-
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/emailInputEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="54dp"
-            android:layout_marginRight="54dp"
-            android:background="#0000"
-            android:drawablePadding="36dp"
-            android:drawableStart="@drawable/mail"
-            android:hint="Email"
-            android:inputType="textPassword"
-            android:maxLines="1"
-            android:padding="16dp"
-            android:textColor="@color/colorText"
-            android:textSize="16sp" />
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
         android:id="@+id/passwordInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -92,7 +64,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:textColorHint="@color/colorText"
-        app:layout_constraintBottom_toTopOf="@+id/signUpButton"
+        app:layout_constraintBottom_toTopOf="@+id/signInButton"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
 
@@ -113,17 +85,40 @@
             android:textSize="16sp" />
     </android.support.design.widget.TextInputLayout>
 
+
     <Button
-        android:id="@+id/signUpButton"
+        android:id="@+id/signInButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="64dp"
         android:layout_marginStart="64dp"
         android:backgroundTint="#cfc391"
-        android:text="@string/sign_up_button"
-        app:layout_constraintBottom_toBottomOf="@+id/backgroundImageView"
+        android:text="@string/sign_in_button"
+        app:layout_constraintBottom_toTopOf="@+id/signInFacebookButton"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
+    <Button
+        android:id="@+id/signInFacebookButton"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="16dp"
+        android:background="@drawable/ic_facebook_logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/signInGoogleButton" />
+
+    <Button
+        android:id="@+id/signInGoogleButton"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="16dp"
+        android:background="@drawable/ic_google_logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/signInFacebookButton"
+        app:layout_constraintRight_toRightOf="parent" />
+
 </android.support.constraint.ConstraintLayout>
+
+

@@ -10,23 +10,13 @@ import com.whisper.whispme.R;
 
 public class SplashActivity extends AppCompatActivity {
 
-    final static int SPLASH_OUT_TIMEOUT = 3000;
+    final static int SPLASH_OUT_TIMEOUT = 500;
     final static int SLEEP_INTERVAL = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        /*
-        //Remove title bar
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        //Remove notification bar
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);*/
-
-        //set content view AFTER ABOVE sequence (to avoid crash)
-        this.setContentView(R.layout.activity_splash);
+        setContentView(R.layout.activity_splash);
 
 
         Thread splashThread = new Thread() {
@@ -42,9 +32,12 @@ public class SplashActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
+
+                    // TODO if user isLogged -> gotoMainViewActivity
+
                     startActivity(
                             new Intent(SplashActivity.this,
-                                    LoginActivity.class));
+                                    MainActivity.class));
                     finish();
                 }
             }
