@@ -33,10 +33,6 @@ public class MainViewActivity extends AppCompatActivity implements OnMapReadyCal
     // GPS
 
 
-    // Sidebar
-    private DrawerLayout mainViewDrawerLayout;
-    private ActionBarDrawerToggle signUpToggle;
-    // Sidebar
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,16 +175,6 @@ public class MainViewActivity extends AppCompatActivity implements OnMapReadyCal
         });
 
 
-        // Sidebar
-        mainViewDrawerLayout = (DrawerLayout) findViewById(R.id.mainViewDrawerLayout);
-        signUpToggle = new ActionBarDrawerToggle(this, mainViewDrawerLayout, R.string.toggle_open, R.string.toggle_close);
-
-        mainViewDrawerLayout.addDrawerListener(signUpToggle);
-        signUpToggle.syncState();
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        // Sidebar
-
     }
 
 
@@ -211,29 +197,5 @@ public class MainViewActivity extends AppCompatActivity implements OnMapReadyCal
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.nav_account:
-                break;
-            case R.id.nav_followers:
-                break;
-            case R.id.nav_log_out:
-                startActivity(new Intent(
-                        MainViewActivity.this,
-                        SignInActivity.class));
-                break;
-        }
-
-
-        if(signUpToggle.onOptionsItemSelected(item))
-        {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
 }
