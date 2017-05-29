@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -17,29 +17,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.whisper.whispme.R;
-import com.whisper.whispme.models.Whisp;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class NewWhispActivity extends AppCompatActivity {
 
     TextView recordStatusTextView;
 
     private MediaRecorder mRecorder;
-    private MediaPlayer mMediaplayer;
+    CountDownTimer recorderCountDownTimer;
+    boolean isFirstRecording;
 
     private String mFileName = null;
 
 
     Button recordWhispButton;
 
-    private ProgressDialog mProgress;
+
 
     private static final String LOG_TAG = "Record_log";
-
 
 
     @Override
@@ -51,23 +47,27 @@ public class NewWhispActivity extends AppCompatActivity {
 
         recordStatusTextView = (TextView) findViewById(R.id.recordStatusTextView);
 
-
-        //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-
         recordWhispButton = (Button) findViewById(R.id.recordWhispButton);
         recordWhispButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent motionEvent) {
 
                 // Record the whisp
+                if (!isFirstRecording) {
+                    return false;
+                }
 
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    startWhispRecording();
-                    recordStatusTextView.setText("Recording started...");
+                    startAudioRecording();
+                    //recordStatusTextView.setText("Recording started...");
+                    recordWhispButton.setAlpha(0.6f);
+                    recorderCountDownTimer.start();
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    stopWhispRecording();
+                    stopAudioRecording();
                     recordStatusTextView.setText("Recording stopped...");
-                    // TODO uploadWhisp();
+                    recordWhispButton.setAlpha(1f);
+                    recorderCountDownTimer.cancel();
+
                     startActivity(new Intent(
                             NewWhispActivity.this,
                             NewWhispRecordedActivity.class));
@@ -76,10 +76,31 @@ public class NewWhispActivity extends AppCompatActivity {
             }
         });
 
-        mProgress = new ProgressDialog(this);
-
         mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
         mFileName += "/recorded_whisp.mp3";
+
+
+        recorderCountDownTimer = new CountDownTimer(15000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                recordStatusTextView.setText("Recording started..." + millisUntilFinished/1000 + "s");
+            }
+
+            public void onFinish() {
+                Toast.makeText(getApplicationContext(),
+                        "Stop auto",
+                        Toast.LENGTH_LONG).show();
+                stopAudioRecording();
+                recordStatusTextView.setText("Recording stopped...");
+                recordWhispButton.setAlpha(1f);
+                recorderCountDownTimer.cancel();
+
+                startActivity(new Intent(
+                        NewWhispActivity.this,
+                        NewWhispRecordedActivity.class));
+            }};
+
+
+        isFirstRecording = true;
     }
 
 
@@ -88,9 +109,13 @@ public class NewWhispActivity extends AppCompatActivity {
         super.onPostResume();
 
         recordStatusTextView.setText("Hold to whisp!");
+        isFirstRecording = true;
     }
 
-    private void startWhispRecording() {
+    private void startAudioRecording() {
+        Toast.makeText(getApplicationContext(), "START",
+                Toast.LENGTH_LONG).show();
+
         mRecorder = new MediaRecorder();
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
@@ -101,32 +126,26 @@ public class NewWhispActivity extends AppCompatActivity {
             mRecorder.prepare();
         } catch (IOException e) {
             Log.e(LOG_TAG, "prepare() failed");
-            Toast.makeText(getApplicationContext(), "prepare() failed", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "prepare() failed",
+                    Toast.LENGTH_LONG).show();
         }
-
-
         mRecorder.start();
-
     }
 
-    private void stopWhispRecording() {
+    private void stopAudioRecording() {
+        Toast.makeText(getApplicationContext(), "STOP",
+                Toast.LENGTH_LONG).show();
+
+        if(mRecorder==null)
+            return;
+
         mRecorder.stop();
         mRecorder.release();
         mRecorder = null;
+
+        isFirstRecording = false;
     }
 
-    /*private void uploadWhisp() {
-
-        mProgress.setMessage("Uploading audio...");
-        mProgress.show();
-
-        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-
-        String audioName = dateFormat.format(new Date());
-
-        // TODO upload whisp to server
-
-    }*/
 
 
 

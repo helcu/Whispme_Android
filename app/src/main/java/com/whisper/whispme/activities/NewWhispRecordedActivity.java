@@ -1,5 +1,6 @@
 package com.whisper.whispme.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -21,7 +22,7 @@ public class NewWhispRecordedActivity extends AppCompatActivity {
     Button playWhispButton;
     TextInputEditText whispTitleInputEditText;
 
-
+    private ProgressDialog mProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,7 @@ public class NewWhispRecordedActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // TODO Create whisp
+                // TODO Upload whisp to server
 
 
                 startActivity(new Intent(
@@ -57,6 +59,23 @@ public class NewWhispRecordedActivity extends AppCompatActivity {
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+        mProgress = new ProgressDialog(this);
     }
+
+
+    /*private void uploadWhisp() {
+
+        mProgress.setMessage("Uploading audio...");
+        mProgress.show();
+
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+        String audioName = dateFormat.format(new Date());
+
+        // TODO upload whisp to server
+
+    }*/
 
 }

@@ -1,16 +1,22 @@
 package com.whisper.whispme.activities;
 
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,23 +29,23 @@ import com.whisper.whispme.R;
 
 public class MainViewActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    // <-- Google map -->
     private GoogleMap mMap;
     private Marker mMakerCurrent;
+    // <!-- Google map -->
 
-
-    // GPS
+    // <-- GPS -->
     private LocationManager locationManager;
     private LocationListener locationListener;
-    // GPS
-
+    // <!-- GPS -->
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_view);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);*/
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -47,8 +53,8 @@ public class MainViewActivity extends AppCompatActivity implements OnMapReadyCal
         mapFragment.getMapAsync(this);
 
 
-        // GPS
-        /*locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        // <-- GPS -->
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         locationListener = new LocationListener() {
             @Override
@@ -114,7 +120,7 @@ public class MainViewActivity extends AppCompatActivity implements OnMapReadyCal
 
 
             // Message: Need GPS!
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 Toast.makeText(getApplicationContext(),
                         "Need GPS!",
                         Toast.LENGTH_SHORT).show();
@@ -124,44 +130,8 @@ public class MainViewActivity extends AppCompatActivity implements OnMapReadyCal
 
             locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
         }
-    }
 
-
-
-        private void showPrompt() {
-
-            AlertDialog.Builder builder =
-                    new AlertDialog.Builder(MainViewActivity.this);
-
-            builder.setTitle("GPS")
-                    .setIcon(R.mipmap.ic_launcher)
-                    .setMessage("Go to GPS setting?")
-                    .setPositiveButton("OK",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface d, int id) {
-                                    startActivity(new Intent(
-                                            Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-
-                                    d.dismiss();
-                                }
-                            })
-                    .setNegativeButton("Cancel",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface d, int id) {
-                                    d.cancel();
-                                    finish();
-                                }
-
-                            });
-
-            builder.create().show();
-        }*/
-
-
-        // GPS
-
-
-
+        // <!-- GPS -->
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -174,8 +144,57 @@ public class MainViewActivity extends AppCompatActivity implements OnMapReadyCal
             }
         });
 
-
     }
+
+    // <-- GPS -->
+    private void showPrompt() {
+
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(MainViewActivity.this);
+
+        builder.setTitle("GPS")
+                .setIcon(R.mipmap.ic_launcher)
+                .setMessage("Go to GPS setting?")
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int id) {
+                                startActivity(new Intent(
+                                        Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+
+                                d.dismiss();
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface d, int id) {
+                                d.cancel();
+                                finish();
+                            }
+
+                        });
+
+        builder.create().show();
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        switch (requestCode) {
+            case 10:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getBaseContext(), "GPS ACTIVATED",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getBaseContext(), "NO GPS ACTIVATED",
+                            Toast.LENGTH_SHORT).show();
+                }
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    // <!-- GPS -->
 
 
     @Override
