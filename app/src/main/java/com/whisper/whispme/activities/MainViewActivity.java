@@ -22,12 +22,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.whisper.whispme.R;
 
-public class MainViewActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainViewActivity extends AppCompatActivity
+        implements OnMapReadyCallback {
 
     // <-- Google map -->
     private GoogleMap mMap;
@@ -60,10 +63,9 @@ public class MainViewActivity extends AppCompatActivity implements OnMapReadyCal
             @Override
             public void onLocationChanged(Location location) {
 
-                Toast.makeText(getApplicationContext(),
+                /*Toast.makeText(getApplicationContext(),
                         "onLocationChanged",
-                        Toast.LENGTH_SHORT).show();
-
+                        Toast.LENGTH_SHORT).show();*/
 
                 if (mMakerCurrent != null) {
                     mMakerCurrent.remove();
@@ -76,8 +78,16 @@ public class MainViewActivity extends AppCompatActivity implements OnMapReadyCal
                         .position(latLng)
                         .title("I'm here!"));
 
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.5f), 4000, null);
+                //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.5f), 4000, null);
+                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+                        new CameraPosition.Builder()
+                                .target(latLng)
+                                .tilt(45)
+                                .bearing(mMap.getCameraPosition().bearing)
+                                .zoom(mMap.getCameraPosition().zoom)
+                                .build()));
+
             }
 
             @Override
@@ -128,7 +138,7 @@ public class MainViewActivity extends AppCompatActivity implements OnMapReadyCal
                 showPrompt();
             }
 
-            locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
+            locationManager.requestLocationUpdates("gps", 100, 0, locationListener);
         }
 
         // <!-- GPS -->
@@ -204,16 +214,30 @@ public class MainViewActivity extends AppCompatActivity implements OnMapReadyCal
         mMap.getUiSettings().setCompassEnabled(false);
         mMap.getUiSettings().setIndoorLevelPickerEnabled(false);
         mMap.getUiSettings().setMapToolbarEnabled(false);
-        mMap.getUiSettings().setZoomGesturesEnabled(false);
+        //mMap.getUiSettings().setZoomGesturesEnabled(false);
+        mMap.setMinZoomPreference(16.0f);
+        mMap.setMaxZoomPreference(17.0f);
         mMap.getUiSettings().setScrollGesturesEnabled(false);
         mMap.getUiSettings().setTiltGesturesEnabled(false);
-        mMap.getUiSettings().setRotateGesturesEnabled(false);
+        //mMap.getUiSettings().setRotateGesturesEnabled(false);
         //mMap.getUiSettings().setAllGesturesEnabled(false);
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("I'm here!"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+        // Set a style to the map
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(
+                        this, R.raw.style_json));
+
+        // Add a default marker in Sydney
+        LatLng defaultLatLng = new LatLng(-34, 151);
+        mMap.addMarker(new MarkerOptions()
+                .position(defaultLatLng)
+                .title("I'm here!"));
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+                new CameraPosition.Builder()
+                        .target(defaultLatLng)
+                        .tilt(40)
+                        .zoom(17f)
+                        .build()));
     }
 
 
