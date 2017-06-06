@@ -1,33 +1,53 @@
 package com.whisper.whispme.models;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by NightmareTK on 19/05/2017.
  */
 
 public class Whisp {
+    private int whispId;
     private int userId;
+    private String urlAudio;
     private String title;
+    private String description;
+    private String urlPhoto;
     private Date dateCreation;
     private float latitude;
     private float longitude;
     private String place;
-    private String urlPhoto;
-    private String urlAudio;
 
     public Whisp() {
     }
 
-    public Whisp(int userId, String title, Date dateCreation, float latitude, float longitude, String place, String urlPhoto, String urlAudio) {
+    public Whisp(int whispId, int userId, String urlAudio, String title, String description, String urlPhoto, Date dateCreation, float latitude, float longitude, String place) {
+        this.whispId = whispId;
         this.userId = userId;
+        this.urlAudio = urlAudio;
         this.title = title;
+        this.description = description;
+        this.urlPhoto = urlPhoto;
         this.dateCreation = dateCreation;
         this.latitude = latitude;
         this.longitude = longitude;
         this.place = place;
-        this.urlPhoto = urlPhoto;
-        this.urlAudio = urlAudio;
+    }
+
+    public int getWhispId() {
+        return whispId;
+    }
+
+    public Whisp setWhispId(int whispId) {
+        this.whispId = whispId;
+        return this;
     }
 
     public int getUserId() {
@@ -39,12 +59,39 @@ public class Whisp {
         return this;
     }
 
+    public String getUrlAudio() {
+        return urlAudio;
+    }
+
+    public Whisp setUrlAudio(String urlAudio) {
+        this.urlAudio = urlAudio;
+        return this;
+    }
+
     public String getTitle() {
         return title;
     }
 
     public Whisp setTitle(String title) {
         this.title = title;
+        return this;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Whisp setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    public String getUrlPhoto() {
+        return urlPhoto;
+    }
+
+    public Whisp setUrlPhoto(String urlPhoto) {
+        this.urlPhoto = urlPhoto;
         return this;
     }
 
@@ -84,21 +131,48 @@ public class Whisp {
         return this;
     }
 
-    public String getUrlPhoto() {
-        return urlPhoto;
+
+
+
+    /*
+    public static Whisp build(JSONObject jsonSource) {
+        Whisp whisp = new Whisp();
+        try {
+            List<String> sortBysAvailable = new ArrayList<>();
+            for(int i = 0; i < jsonSource.getJSONArray("sortBysAvailable").length(); i++ ) {
+                sortBysAvailable.add(jsonSource.getJSONArray("sortBysAvailable").getString(i));
+            }
+            String url = jsonSource.getString("url");
+            Map<String, String> urlsToLogos = ClearbitLogoApi.getUrlsToLogosFor(url);
+            whisp.setId(jsonSource.getString("id"))
+                    .setName(jsonSource.getString("name"))
+                    .setDescription(jsonSource.getString("description"))
+                    .setUrl(jsonSource.getString("url"))
+                    .setCategory(jsonSource.getString("category"))
+                    .setLanguage(jsonSource.getString("language"))
+                    .setCountry(jsonSource.getString("country"))
+                    .setSortBysAvailable(sortBysAvailable)
+                    .setUrlsToLogos(urlsToLogos);
+            return whisp;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    public Whisp setUrlPhoto(String urlPhoto) {
-        this.urlPhoto = urlPhoto;
-        return this;
+    public static List<Whisp> build(JSONArray jsonSources) {
+        List<Whisp> whisps = new ArrayList<>();
+        for(int i = 0; i < jsonSources.length(); i++)
+            try {
+                whisps.add(Whisp.build(jsonSources.getJSONObject(i)));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        return whisps;
     }
+    */
 
-    public String getUrlAudio() {
-        return urlAudio;
-    }
 
-    public Whisp setUrlAudio(String urlAudio) {
-        this.urlAudio = urlAudio;
-        return this;
-    }
+
+
 }

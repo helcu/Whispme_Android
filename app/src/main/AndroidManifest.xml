@@ -21,6 +21,7 @@
         android:allowBackup="true"
         android:icon="@drawable/logo_whispme_mini"
         android:label="@string/app_name"
+        android:name=".WhispmeApp"
         android:roundIcon="@drawable/logo_whispme_mini"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
