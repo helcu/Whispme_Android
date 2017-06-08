@@ -9,13 +9,13 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +32,6 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.whisper.whispme.R;
-import com.whisper.whispme.activities.MainViewActivity;
 import com.whisper.whispme.activities.NewWhispActivity;
 import com.whisper.whispme.models.Whisp;
 
@@ -43,19 +42,27 @@ import java.util.List;
  */
 public class WhispsFragment extends Fragment
         implements OnMapReadyCallback {
+    //}, DialogInterface.OnDismissListener {
 
     // <-- Google map -->
     private GoogleMap mMap;
     private Marker mMakerCurrent;
     // <!-- Google map -->
 
-    // <-- GPS -->
+    // <-- Location -->
     private LocationManager locationManager;
     private LocationListener locationListener;
-    // <!-- GPS -->
+
+    private AlertDialog.Builder alertDialogBuilder;
+    private boolean isLocationListening;
+    // <!-- Location -->
 
 
     List<Whisp> whisps;
+
+    private final int PERMISSIONS_REQUEST_CODE_FINE_LOCATION = 10;
+    private final long REQUEST_LOCATION_UPDATE_TIME = 0;
+
 
     public WhispsFragment() {
         // Required empty public constructor
@@ -75,11 +82,14 @@ public class WhispsFragment extends Fragment
         }
 
 
-        // <-- GPS -->
+        // <-- Location -->
         locationManager = (LocationManager) getActivity()
                 .getSystemService(Context.LOCATION_SERVICE);
 
         locationListener = new LocationListener() {
+
+            private AlertDialog alertDialog;
+
             @Override
             public void onLocationChanged(Location location) {
 
@@ -98,8 +108,6 @@ public class WhispsFragment extends Fragment
                         .position(latLng)
                         .title("I'm here!"));
 
-                //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.5f), 4000, null);
                 mMap.moveCamera(CameraUpdateFactory.newCameraPosition(
                         new CameraPosition.Builder()
                                 .target(latLng)
@@ -122,6 +130,15 @@ public class WhispsFragment extends Fragment
                 Toast.makeText(getContext(),
                         "onProviderEnabled",
                         Toast.LENGTH_SHORT).show();
+
+                isLocationListening = true;
+
+                if (alertDialog == null)
+                    return;
+
+                if (alertDialog.isShowing()) {
+                    alertDialog.dismiss();
+                }
             }
 
             @Override
@@ -129,65 +146,24 @@ public class WhispsFragment extends Fragment
                 Toast.makeText(getContext(),
                         "onProviderDisabled",
                         Toast.LENGTH_SHORT).show();
+
+                locationManager.removeUpdates(locationListener);
+                isLocationListening = false;
+
+                if (!locationManager.isProviderEnabled(
+                        LocationManager.GPS_PROVIDER)) {
+                    alertDialog = alertDialogBuilder.show();
+                }
             }
         };
 
+        requestLocalizationPermissions();
 
-        if (ActivityCompat.checkSelfPermission(getContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+        alertDialogBuilder = new AlertDialog.Builder(getContext());
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{
-                                Manifest.permission.ACCESS_COARSE_LOCATION,
-                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.INTERNET}
-                        , 10);
-            }
-
-
-            // Message: Need GPS!
-            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                Toast.makeText(getContext(),
-                        "Need GPS!",
-                        Toast.LENGTH_SHORT).show();
-
-                showPrompt();
-            }
-
-            locationManager.requestLocationUpdates("gps", 100, 0, locationListener);
-        }
-
-        // <!-- GPS -->
-
-
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(
-                        view.getContext(),
-                        NewWhispActivity.class));
-            }
-        });
-
-        return view;
-
-    }
-
-
-    // <-- GPS -->
-    private void showPrompt() {
-
-        AlertDialog.Builder builder =
-                new AlertDialog.Builder(getContext());
-
-        builder.setTitle("GPS")
-                .setIcon(R.mipmap.ic_launcher)
-                .setMessage("Go to GPS setting?")
+        alertDialogBuilder.setTitle("GPS")
+                .setIcon(R.drawable.ic_gps_fixed_black_24dp)
+                .setMessage("Whispme need your position for create")
                 .setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface d, int id) {
@@ -203,31 +179,111 @@ public class WhispsFragment extends Fragment
                                 d.cancel();
                             }
 
-                        });
+                        })
+                .create();
 
-        builder.create().show();
+
+        // <!-- Location -->
+
+
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(
+                        view.getContext(),
+                        NewWhispActivity.class));
+            }
+        });
+
+        return view;
     }
+
+
+    // <-- Location -->
+    private void requestLocalizationPermissions() {
+        if (ContextCompat.checkSelfPermission(
+                getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Localization permission is needed")
+                        .setMessage("Whispme needs your position for create")
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                ActivityCompat.requestPermissions(getActivity(),
+                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                        PERMISSIONS_REQUEST_CODE_FINE_LOCATION);
+                            }
+                        });
+                builder.create().show();
+
+            } else {
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        PERMISSIONS_REQUEST_CODE_FINE_LOCATION);
+            }
+        } else {
+
+            if (!isLocationListening) {
+                Toast.makeText(getContext(),
+                        "Permission granted!",
+                        Toast.LENGTH_SHORT).show();
+
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                        REQUEST_LOCATION_UPDATE_TIME, 0, locationListener);
+                isLocationListening = true;
+            }
+        }
+    }
+
+    // <!-- Location -->
 
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
         switch (requestCode) {
-            case 10:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getContext(), "GPS ACTIVATED",
+            case PERMISSIONS_REQUEST_CODE_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    Toast.makeText(getContext(),
+                            "GPS activated",
                             Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getContext(), "NO GPS ACTIVATED",
+
+                    Toast.makeText(getContext(),
+                            "GPS denied",
                             Toast.LENGTH_SHORT).show();
                 }
+            }
         }
-
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    // <!-- GPS -->
+    @Override
+    public void onPause() {
+        locationManager.removeUpdates(locationListener);
+        isLocationListening = false;
+        super.onPause();
+    }
 
+    @Override
+    public void onResume() {
+        requestLocalizationPermissions();
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        locationManager.removeUpdates(locationListener);
+        isLocationListening = false;
+        super.onStop();
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
