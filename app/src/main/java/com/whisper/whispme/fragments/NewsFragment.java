@@ -77,7 +77,7 @@ public class NewsFragment extends Fragment {
                                 Log.d(TAG, response.getString("message"));
                                 return;
                             }
-                            whisps = Whisp.build(response.getJSONArray("sources"));
+                            users = Whisp.build(response.getJSONArray("sources"));
                             sourcesAdapter.setSources(sources).notifyDataSetChanged();
                         } catch (JSONException e) {
                             e.printStackTrace();

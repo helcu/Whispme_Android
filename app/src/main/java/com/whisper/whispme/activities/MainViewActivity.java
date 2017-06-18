@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import com.whisper.whispme.R;
 import com.whisper.whispme.fragments.NewsFragment;
 import com.whisper.whispme.fragments.SettingsFragment;
+import com.whisper.whispme.fragments.UsersFragment;
 import com.whisper.whispme.fragments.WhispsFragment;
 
 public class MainViewActivity extends AppCompatActivity {
@@ -35,7 +36,7 @@ public class MainViewActivity extends AppCompatActivity {
     private Fragment getFragmentFor(int id) {
         switch (id) {
             case R.id.navigation_whisps: return new WhispsFragment();
-            case R.id.navigation_users: return new SettingsFragment();
+            case R.id.navigation_users: return new UsersFragment();
             case R.id.navigation_news: return new NewsFragment();
             case R.id.navigation_settings: return new SettingsFragment();
             default: return null;
