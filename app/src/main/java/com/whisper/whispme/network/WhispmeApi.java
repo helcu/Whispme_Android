@@ -5,6 +5,6 @@ package com.whisper.whispme.network;
  */
 
 public class WhispmeApi {
-    public static String WHIPS_URL = "";
+    public static String WHIPS_URL = "https://frozen-anchorage-68785.herokuapp.com/";
 
 }

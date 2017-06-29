@@ -2,25 +2,33 @@ package com.whisper.whispme.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.whisper.whispme.R;
+import com.whisper.whispme.fragments.WhispPlayerFragment;
+
+import java.io.IOException;
 
 public class NewWhispRecordedActivity extends AppCompatActivity {
 
 
     Button playWhispButton;
     TextInputEditText whispTitleInputEditText;
+
 
     private ProgressDialog mProgress;
 
@@ -37,10 +45,9 @@ public class NewWhispRecordedActivity extends AppCompatActivity {
         playWhispButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri data = Uri.parse(Environment.getExternalStorageDirectory()
-                        .getPath() + "/recorded_whisp.mp3");
-                MediaPlayer mp = MediaPlayer.create(v.getContext(), data);
-                mp.start();
+
+                WhispPlayerFragment fragment = new WhispPlayerFragment();
+                fragment.show(getSupportFragmentManager(), "Player");
             }
         });
 
@@ -63,6 +70,7 @@ public class NewWhispRecordedActivity extends AppCompatActivity {
 
         mProgress = new ProgressDialog(this);
     }
+
 
 
     /*private void uploadWhisp() {

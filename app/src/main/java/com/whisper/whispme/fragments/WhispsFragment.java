@@ -12,7 +12,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -26,13 +25,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.whisper.whispme.R;
-import com.whisper.whispme.activities.NewWhispActivity;
 import com.whisper.whispme.models.Whisp;
 
 import java.util.List;
@@ -185,17 +184,6 @@ public class WhispsFragment extends Fragment
 
         // <!-- Location -->
 
-
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(
-                        view.getContext(),
-                        NewWhispActivity.class));
-            }
-        });
-
         return view;
     }
 
@@ -306,16 +294,68 @@ public class WhispsFragment extends Fragment
                 getContext(), R.raw.style_json));
 
         // Add a default marker in Sydney
-        LatLng defaultLatLng = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions()
-                .position(defaultLatLng)
-                .title("I'm here!"));
-        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+        addMarkerToMap(new LatLng(-34, 151), "I'm here");
+        addMarkerToMap(new LatLng(-34.0005, 151), "I'm here");
+
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(
                 new CameraPosition.Builder()
-                        .target(defaultLatLng)
+                        .target(new LatLng(-34, 151))
                         .tilt(40)
                         .zoom(17f)
                         .build()));
     }
+
+
+    void addMarkerToMap(LatLng position, String title) {
+        mMap.addMarker(new MarkerOptions()
+                .position(position)
+                .title(title)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_facebook_logo)));
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                marker.setTitle(marker.getId());
+                marker.showInfoWindow();
+                return true;
+            }
+        });
+    }
+
+
+    // <-- MediaPlayer -->
+
+    /*
+        String whispUrl =
+            "https://www.dropbox.com/s/v9fporswii5q00d/Este%20altavoz%20es__.mp3?dl=1";
+        //mediaPlayer = MediaPlayer.create(this, recordedWhispUri);
+
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        try {
+            mediaPlayer.setDataSource(whispUrl);
+
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mp.start();
+                }
+            });
+
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mp.release();
+                }
+            });
+
+            mediaPlayer.prepareAsync();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    */
+    // <!-- MediaPlayer -->
+
 
 }

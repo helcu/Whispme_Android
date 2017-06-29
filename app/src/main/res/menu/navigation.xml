@@ -12,6 +12,11 @@
         android:title="Users" />
 
     <item
+        android:id="@+id/navigation_create_whisp"
+        android:icon="@drawable/ic_radio_button_unchecked_black_24dp"
+        android:title=""/>
+
+    <item
         android:id="@+id/navigation_news"
         android:icon="@drawable/ic_new_releases_black_24dp"
         android:title="News" />
