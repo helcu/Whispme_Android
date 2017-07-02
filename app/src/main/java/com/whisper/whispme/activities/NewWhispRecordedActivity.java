@@ -59,9 +59,14 @@ public class NewWhispRecordedActivity extends AppCompatActivity {
                 // TODO Upload whisp to server
 
 
-                startActivity(new Intent(
+                Intent intent = new Intent(
                         NewWhispRecordedActivity.this,
-                        MainViewActivity.class));
+                        MainViewActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivity(intent);
+                finish();
 
             }
         });
