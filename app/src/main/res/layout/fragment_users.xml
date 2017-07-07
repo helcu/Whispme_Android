@@ -5,7 +5,7 @@
     android:id="@+id/fragment1_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.whisper.whispme.fragments.UsersFragment">
+    tools:context="com.whisper.whispme.fragments.UserFragment">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"

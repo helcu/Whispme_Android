@@ -12,10 +12,10 @@ import com.whisper.whispme.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SettingsFragment extends Fragment {
+public class WorldFragment extends Fragment {
 
 
-    public SettingsFragment() {
+    public WorldFragment() {
         // Required empty public constructor
     }
 

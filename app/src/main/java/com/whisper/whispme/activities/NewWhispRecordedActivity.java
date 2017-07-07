@@ -4,18 +4,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -33,9 +28,6 @@ import com.whisper.whispme.network.WhispmeApi;
 import com.whisper.whispme.network.WhispmeApiInterface;
 
 import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class NewWhispRecordedActivity extends AppCompatActivity {
@@ -137,15 +129,15 @@ public class NewWhispRecordedActivity extends AppCompatActivity {
                                 getSharedPreferences("WhispmeSP", Context.MODE_PRIVATE);
                         int userId = prefs.getInt(getString(R.string.sp_user_id), 0);
 
-                        Toast.makeText(NewWhispRecordedActivity.this,
+                        /*Toast.makeText(NewWhispRecordedActivity.this,
                                 String.valueOf(userId),
-                                Toast.LENGTH_LONG).show();
+                                Toast.LENGTH_LONG).show();*/
 
                         Whisp whisp = new Whisp();
                         whisp.setUserId(userId)
                                 .setUrlAudio(audioName)
-                                .setTitle("title")
-                                .setDescription("description")
+                                .setTitle(whispTitleInputEditText.getText().toString())
+                                .setText("description")
                                 .setUrlPhoto("urlPhoto")
                                 .setDateCreation(new Date())
                                 .setLatitude(WhispsFragment.LATITUDE)

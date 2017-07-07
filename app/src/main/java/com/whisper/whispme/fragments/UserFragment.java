@@ -15,12 +15,12 @@ import com.whisper.whispme.adapters.ViewPagerAdapter;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class UsersFragment extends Fragment {
+public class UserFragment extends Fragment {
 
     TabLayout mainTabLayout;
     ViewPager mainViewPager;
 
-    public UsersFragment() {
+    public UserFragment() {
         // Required empty public constructor
     }
 
@@ -37,7 +37,6 @@ public class UsersFragment extends Fragment {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getActivity().getSupportFragmentManager());
         adapter.addFragment(new UserProfileFragment(), "Profile");
         adapter.addFragment(new FollowersFragment(), "Followers");
-        adapter.addFragment(new UsersWorldFragment(), "World");
         mainViewPager.setAdapter(adapter);
 
         mainTabLayout.setTabMode(TabLayout.MODE_FIXED);

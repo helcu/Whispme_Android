@@ -1,5 +1,12 @@
 package com.whisper.whispme.models;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by NightmareTK on 31/05/2017.
  */
@@ -65,5 +72,32 @@ public class User {
     public User setDescription(String description) {
         this.description = description;
         return this;
+    }
+
+
+    public static User build(JSONObject jsonSource) {
+        User user = new User();
+        try {
+            return user.setUserId(jsonSource.getInt("idUser"))
+                    .setUsername(jsonSource.getString("userName"))
+                    .setUrlPhoto(jsonSource.getString("urlPhoto"))
+                    .setDescription(jsonSource.getString("description"))
+                    .setEmail(jsonSource.getString("email"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static List<User> build(JSONArray jsonSources) {
+        List<User> users = new ArrayList<>();
+        for (int i = 0; i < jsonSources.length(); i++)
+            try {
+                users.add(build(jsonSources.getJSONObject(i)));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        return users;
     }
 }

@@ -10,8 +10,8 @@ import android.view.MenuItem;
 
 import com.whisper.whispme.R;
 import com.whisper.whispme.fragments.NewsFragment;
-import com.whisper.whispme.fragments.SettingsFragment;
-import com.whisper.whispme.fragments.UsersFragment;
+import com.whisper.whispme.fragments.WorldFragment;
+import com.whisper.whispme.fragments.UserFragment;
 import com.whisper.whispme.fragments.WhispsFragment;
 import com.whisper.whispme.helpers.BottomNavigationViewHelper;
 
@@ -51,11 +51,11 @@ public class MainViewActivity extends AppCompatActivity {
             case R.id.navigation_whisps:
                 return new WhispsFragment();
             case R.id.navigation_users:
-                return new UsersFragment();
+                return new UserFragment();
             case R.id.navigation_news:
                 return new NewsFragment();
             case R.id.navigation_settings:
-                return new SettingsFragment();
+                return new WorldFragment();
             default:
                 return null;
         }

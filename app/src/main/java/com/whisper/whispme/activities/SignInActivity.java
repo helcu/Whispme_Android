@@ -1,5 +1,6 @@
 package com.whisper.whispme.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,11 +25,12 @@ public class SignInActivity
         implements View.OnFocusChangeListener {
 
     TextInputEditText usernameInputEditText, passwordInputEditText;
-    Button loginButton, loginFacebookButton, loginGoogleButton;
+    Button loginButton;
 
     WhispmeApi whispmeApi;
     boolean isUsingWhispApi;
 
+    private ProgressDialog mProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,10 @@ public class SignInActivity
                 new WhispmeApiInterface.SignInListener() {
                     @Override
                     public void onEventCompleted(int userId) {
+
+                        mProgress.dismiss();
+
+
                         if (userId != 0) {
 
                             SharedPreferences.Editor editor = getSharedPreferences(
@@ -73,6 +79,9 @@ public class SignInActivity
 
                     @Override
                     public void onEventFailed(String apiResponse) {
+
+                        mProgress.dismiss();
+
                         Toast.makeText(SignInActivity.this, apiResponse,
                                 Toast.LENGTH_SHORT).show();
                         isUsingWhispApi = false;
@@ -97,6 +106,8 @@ public class SignInActivity
                 // TODO remove this! DEBUG ONLY
                 //gotoMainViewActivity();
                 //finish();
+                mProgress.setMessage("Sign in...");
+                mProgress.show();
 
 
                 if (isUsingWhispApi) {
@@ -116,31 +127,12 @@ public class SignInActivity
 
                 // TODO request username and password validation to backend
                 isUsingWhispApi = true;
-                whispmeApi.loginWithUsernameAndPassword(username, password);
+                whispmeApi.signIn(username, password);
             }
         });
 
-        loginFacebookButton = (Button) findViewById(R.id.signInFacebookButton);
-        loginFacebookButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        mProgress = new ProgressDialog(this);
 
-                // TODO request Google token to backend
-
-                gotoMainViewActivity();
-            }
-        });
-
-        loginGoogleButton = (Button) findViewById(R.id.signInGoogleButton);
-        loginGoogleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                // TODO request Google token to backend
-
-                gotoMainViewActivity();
-            }
-        });
     }
 
     private boolean isInputValid(String username, String password) {

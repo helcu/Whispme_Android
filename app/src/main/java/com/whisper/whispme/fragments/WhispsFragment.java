@@ -2,6 +2,7 @@ package com.whisper.whispme.fragments;
 
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -46,6 +47,7 @@ import com.whisper.whispme.network.WhispmeApiInterface;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -56,7 +58,7 @@ public class WhispsFragment extends Fragment
 
     // <-- Google map -->
     private GoogleMap mMap;
-    private Marker mMakerCurrent;
+    private Marker makerCurrent;
     // <!-- Google map -->
 
     // <-- Internet -->
@@ -78,14 +80,14 @@ public class WhispsFragment extends Fragment
     // <-- WhispmeApi -->
     WhispmeApi whispmeApi;
     boolean isUsingWhispApi;
-    Map<String, Whisp> markerWhisps;
+    Map<Marker, Whisp> markerWhisps;
 
     private int nearWhispsUpdateTime = 0;
     // <!- WhispmeApi -->
 
 
     private final int PERMISSIONS_REQUEST_CODE_FINE_LOCATION = 10;
-    private final long REQUEST_LOCATION_UPDATE_TIME = 0;
+    private final long REQUEST_LOCATION_UPDATE_TIME = 5000;
 
 
     public WhispsFragment() {
@@ -113,6 +115,7 @@ public class WhispsFragment extends Fragment
         whispmeApi.getNearWhispsListener = new WhispmeApiInterface.GetNearWhispsListener() {
             @Override
             public void onEventCompleted(List<Whisp> whisps) {
+
                 mMap.clear();
                 markerWhisps.clear();
 
@@ -121,8 +124,18 @@ public class WhispsFragment extends Fragment
                             new LatLng(whisp.getLatitude(), whisp.getLongitude()),
                             String.valueOf(whisp.getWhispId()),
                             R.drawable.ic_globe_32x32);
-                    markerWhisps.put(marker.getId(), whisp);
+                    markerWhisps.put(marker, whisp);
                 }
+
+
+                if (makerCurrent != null)
+                    makerCurrent.remove();
+
+                makerCurrent = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(LATITUDE, LONGITUDE))
+                        .title("I'm here!")
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person_40x40)));
+
                 isUsingWhispApi = false;
             }
 
@@ -132,6 +145,40 @@ public class WhispsFragment extends Fragment
                         apiResponse,
                         Toast.LENGTH_SHORT).show();
                 isUsingWhispApi = false;
+            }
+        };
+
+        whispmeApi.getWhispDetailListener = new WhispmeApiInterface.GetWhispDetailListener() {
+            @Override
+            public void onEventCompleted(Whisp whisp) {
+
+                StorageReference storageRef = FirebaseStorage.getInstance()
+                        .getReference().child("whisps_audios/" + whisp.getUrlAudio() + ".mp3");
+
+                storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri downloadUrl) {
+                        WhispPlayerFragment fragment = new WhispPlayerFragment();
+
+                        fragment.whispUri = downloadUrl;
+                        fragment.show(getFragmentManager(), "Player");
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getContext(),
+                                e.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onEventFailed(String apiResponse) {
+
+                Toast.makeText(getContext(),
+                        apiResponse,
+                        Toast.LENGTH_SHORT).show();
             }
         };
 
@@ -154,40 +201,36 @@ public class WhispsFragment extends Fragment
                         "onLocationChanged",
                         Toast.LENGTH_SHORT).show();*/
 
-                if (mMakerCurrent != null) {
-                    mMakerCurrent.remove();
-                }
-
-                LATITUDE = (float) location.getLatitude();
-                LONGITUDE = (float) location.getLongitude();
-
-                LatLng latLng = new LatLng(
-                        location.getLatitude(),
-                        location.getLongitude());
-                mMakerCurrent = mMap.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .title("I'm here!")
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person_40x40)));
-
-                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(
-                        new CameraPosition.Builder()
-                                .target(latLng)
-                                .tilt(45)
-                                .bearing(mMap.getCameraPosition().bearing)
-                                .zoom(mMap.getCameraPosition().zoom)
-                                .build()));
-
-
                 if (nearWhispsUpdateTime == 0) {
                     whispmeApi.getNearWhisps(
                             (float) location.getLatitude(),
                             (float) location.getLongitude());
                 }
                 nearWhispsUpdateTime++;
-                if (nearWhispsUpdateTime > 9) {
+                if (nearWhispsUpdateTime > 0) {
                     nearWhispsUpdateTime = 0;
                 }
 
+
+                if (makerCurrent != null) {
+                    makerCurrent.remove();
+                }
+
+                LATITUDE = (float) location.getLatitude();
+                LONGITUDE = (float) location.getLongitude();
+
+                makerCurrent = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(LATITUDE, LONGITUDE))
+                        .title("I'm here!")
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person_40x40)));
+
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+                        new CameraPosition.Builder()
+                                .target(new LatLng(LATITUDE, LONGITUDE))
+                                .tilt(45)
+                                .bearing(mMap.getCameraPosition().bearing)
+                                .zoom(mMap.getCameraPosition().zoom)
+                                .build()));
             }
 
             @Override
@@ -337,9 +380,9 @@ public class WhispsFragment extends Fragment
         } else {
 
             if (!isLocationListening) {
-                Toast.makeText(getContext(),
+                /*Toast.makeText(getContext(),
                         "Permission granted!",
-                        Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_SHORT).show();*/
 
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                         REQUEST_LOCATION_UPDATE_TIME, 0, locationListener);
@@ -402,45 +445,28 @@ public class WhispsFragment extends Fragment
         mMap.getUiSettings().setIndoorLevelPickerEnabled(false);
         mMap.getUiSettings().setMapToolbarEnabled(false);
         //mMap.getUiSettings().setZoomGesturesEnabled(false);
-        //mMap.setMinZoomPreference(16.0f);
-        //mMap.setMaxZoomPreference(17.0f);
+        mMap.setMinZoomPreference(16.0f);
+        mMap.setMaxZoomPreference(17.0f);
         //mMap.getUiSettings().setScrollGesturesEnabled(false);
         mMap.getUiSettings().setTiltGesturesEnabled(false);
         //mMap.getUiSettings().setRotateGesturesEnabled(false);
         //mMap.getUiSettings().setAllGesturesEnabled(false);
 
-
         // Set a style to the map
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(
                 getContext(), R.raw.style_json));
 
-
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                marker.setTitle(marker.getId());
-                marker.showInfoWindow();
+                //marker.setTitle(marker.getId());
+                //marker.showInfoWindow();
 
-                Whisp whisp = markerWhisps.get(marker.getId());
+                if (Objects.equals(marker.getId(), makerCurrent.getId()))
+                    return true;
 
-                StorageReference mStorage = FirebaseStorage.getInstance().getReference();
-                mStorage.child("whisps_audios").child(whisp.getUrlAudio() + ".mp3").getDownloadUrl()
-                        .addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                WhispPlayerFragment fragment = new WhispPlayerFragment();
-
-                                fragment.whispUri = uri;
-                                fragment.show(getFragmentManager(), "Player");
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getContext(),
-                                "Firebase error downloading",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Whisp whisp = markerWhisps.get(marker);
+                whispmeApi.getWhispDetail(whisp.getWhispId());
 
                 return true;
             }
@@ -454,41 +480,6 @@ public class WhispsFragment extends Fragment
                 .title(title)
                 .icon(BitmapDescriptorFactory.fromResource(iconId)));
     }
-
-    // <-- MediaPlayer -->
-
-    /*
-        String whispUrl =
-            "https://www.dropbox.com/s/v9fporswii5q00d/Este%20altavoz%20es__.mp3?dl=1";
-        //mediaPlayer = MediaPlayer.create(this, whispUri);
-
-        MediaPlayer mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-        try {
-            mediaPlayer.setDataSource(whispUrl);
-
-            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    mp.start();
-                }
-            });
-
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    mp.release();
-                }
-            });
-
-            mediaPlayer.prepareAsync();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    */
-    // <!-- MediaPlayer -->
 
 
 }

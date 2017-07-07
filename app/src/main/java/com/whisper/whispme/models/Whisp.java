@@ -9,7 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by NightmareTK on 19/05/2017.
@@ -20,7 +19,7 @@ public class Whisp {
     private int userId;
     private String urlAudio;
     private String title;
-    private String description;
+    private String text;
     private String urlPhoto;
     private Date dateCreation;
     private float latitude;
@@ -30,12 +29,12 @@ public class Whisp {
     public Whisp() {
     }
 
-    public Whisp(int whispId, int userId, String urlAudio, String title, String description, String urlPhoto, Date dateCreation, float latitude, float longitude, String place) {
+    public Whisp(int whispId, int userId, String urlAudio, String title, String text, String urlPhoto, Date dateCreation, float latitude, float longitude, String place) {
         this.whispId = whispId;
         this.userId = userId;
         this.urlAudio = urlAudio;
         this.title = title;
-        this.description = description;
+        this.text = text;
         this.urlPhoto = urlPhoto;
         this.dateCreation = dateCreation;
         this.latitude = latitude;
@@ -79,12 +78,12 @@ public class Whisp {
         return this;
     }
 
-    public String getDescription() {
-        return description;
+    public String getText() {
+        return text;
     }
 
-    public Whisp setDescription(String description) {
-        this.description = description;
+    public Whisp setText(String text) {
+        this.text = text;
         return this;
     }
 
@@ -137,13 +136,13 @@ public class Whisp {
     public static Whisp build(JSONObject jsonSource) {
         Whisp whisp = new Whisp();
         try {
-            whisp.setWhispId(jsonSource.getInt("whispId"))
-                    .setUserId(jsonSource.getInt("UserId"))
+            whisp.setWhispId(jsonSource.getInt("idWhisp"))
+                    .setUserId(jsonSource.getInt("idUser"))
                     .setUrlAudio(jsonSource.getString("urlAudio"))
                     .setTitle(jsonSource.getString("title"))
-                    .setDescription(jsonSource.getString("description"))
+                    .setText(jsonSource.getString("text"))
                     .setUrlPhoto(jsonSource.getString("urlPhoto"))
-                    .setDateCreation((new SimpleDateFormat("dd-MMM-yyyy"))
+                    .setDateCreation((new SimpleDateFormat("yyyy-MM-dd"))
                             .parse(jsonSource.getString("dateCreation")))
                     .setLatitude(Float.parseFloat(jsonSource.getString("latitude")))
                     .setLongitude(Float.parseFloat(jsonSource.getString("longitude")))
