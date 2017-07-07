@@ -1,7 +1,11 @@
 package com.whisper.whispme.activities;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.design.widget.TextInputEditText;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,8 +14,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.whisper.whispme.R;
-import com.whisper.whispme.helpers.InputValidator;
+import com.whisper.whispme.helpers.InputValidatorHelper;
 import com.whisper.whispme.network.WhispmeApi;
+import com.whisper.whispme.network.WhispmeApiInterface;
 
 
 public class SignInActivity
@@ -31,26 +36,48 @@ public class SignInActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
-        whispmeApi = new WhispmeApi(new WhispmeApi.WhispmeApiListener() {
-            @Override
-            public void onEventCompleted(boolean hasAccess) {
-                if (hasAccess) {
-                    gotoMainViewActivity();
-                    return;
-                }
-                isUsingWhispApi = false;
-                // TODO show dialog "NO ACCESS"
-                Toast.makeText(getBaseContext(), "NO ACCESS",
-                        Toast.LENGTH_SHORT).show();
-            }
+        whispmeApi = new WhispmeApi();
+        whispmeApi.signInListener =
+                new WhispmeApiInterface.SignInListener() {
+                    @Override
+                    public void onEventCompleted(int userId) {
+                        if (userId != 0) {
 
-            @Override
-            public void onEventFailed(String apiResponse) {
-                Toast.makeText(getBaseContext(), apiResponse,
-                        Toast.LENGTH_SHORT).show();
-                isUsingWhispApi = false;
-            }
-        });
+                            SharedPreferences.Editor editor = getSharedPreferences(
+                                    "WhispmeSP", Context.MODE_PRIVATE).edit();
+                            editor.putInt(getString(R.string.sp_user_id), userId);
+                            editor.apply();
+
+                            gotoMainViewActivity();
+                            return;
+                        }
+                        isUsingWhispApi = false;
+
+                        // TODO show dialog "NO ACCESS"
+                        try {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(SignInActivity.this);
+                            builder.setTitle("Sign In")
+                                    .setMessage("Incorrect user or password")
+                                    .setPositiveButton("OK",
+                                            new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                }
+                                            });
+                            builder.create().show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onEventFailed(String apiResponse) {
+                        Toast.makeText(SignInActivity.this, apiResponse,
+                                Toast.LENGTH_SHORT).show();
+                        isUsingWhispApi = false;
+                    }
+                };
         isUsingWhispApi = false;
 
         usernameInputEditText = (TextInputEditText)
@@ -117,8 +144,8 @@ public class SignInActivity
     }
 
     private boolean isInputValid(String username, String password) {
-        boolean isBlankUsername = InputValidator.isBlank(username);
-        boolean isBlankPassword = InputValidator.isBlank(password);
+        boolean isBlankUsername = InputValidatorHelper.isBlank(username);
+        boolean isBlankPassword = InputValidatorHelper.isBlank(password);
 
         if (isBlankUsername) {
             usernameInputEditText.setError("required");
@@ -130,8 +157,8 @@ public class SignInActivity
             return false;
         }
 
-        boolean isValidUsername = InputValidator.isValidUsername(username);
-        boolean isValidPassword = InputValidator.isValidPassword(password);
+        boolean isValidUsername = InputValidatorHelper.isValidUsername(username);
+        boolean isValidPassword = InputValidatorHelper.isValidPassword(password);
 
         if (!isValidUsername) {
             usernameInputEditText.setError("format 5-10");
@@ -159,19 +186,19 @@ public class SignInActivity
         if (hasFocus) {
             return;
         }
-        if (InputValidator.isBlank(((TextView) v).getText().toString())) {
+        if (InputValidatorHelper.isBlank(((TextView) v).getText().toString())) {
             ((TextView) v).setError("required");
             return;
         }
 
         switch (v.getId()) {
             case R.id.usernameInputEditText:
-                if (!InputValidator.isValidUsername(((TextView) v).getText().toString())) {
+                if (!InputValidatorHelper.isValidUsername(((TextView) v).getText().toString())) {
                     ((TextView) v).setError("format 5-10");
                 }
                 break;
             case R.id.passwordInputEditText:
-                if (!InputValidator.isValidPassword(((TextView) v).getText().toString())) {
+                if (!InputValidatorHelper.isValidPassword(((TextView) v).getText().toString())) {
                     ((TextView) v).setError("format >=6");
                 }
                 break;

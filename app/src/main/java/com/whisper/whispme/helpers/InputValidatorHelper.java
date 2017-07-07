@@ -7,9 +7,9 @@ import java.util.regex.Pattern;
  * Created by NightmareTK on 01/07/2017.
  */
 
-public class InputValidator {
+public class InputValidatorHelper {
 
-    InputValidator() {
+    InputValidatorHelper() {
     }
 
 

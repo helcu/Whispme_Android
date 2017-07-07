@@ -1,13 +1,11 @@
 package com.whisper.whispme.fragments;
 
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -24,7 +22,7 @@ import com.whisper.whispme.R;
 public class WhispPlayerFragment extends DialogFragment {
 
     MediaPlayer mediaPlayer;
-    Uri recordedWhispUri = Uri.parse(Environment.getExternalStorageDirectory()
+    public Uri whispUri = Uri.parse(Environment.getExternalStorageDirectory()
             .getPath() + "/recorded_whisp.mp3");
 
     SeekBar whispSeekBar;
@@ -34,6 +32,7 @@ public class WhispPlayerFragment extends DialogFragment {
     public WhispPlayerFragment() {
         // Required empty public constructor
     }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,10 +60,32 @@ public class WhispPlayerFragment extends DialogFragment {
             }
         };
 
-        mediaPlayer = MediaPlayer.create(getContext(), recordedWhispUri);
+        mediaPlayer = MediaPlayer.create(getContext(), whispUri);
         mediaPlayer.start();
         whispSeekBar.setMax(mediaPlayer.getDuration());
         whispSeekBar.setProgress(mediaPlayer.getCurrentPosition());
+        whispSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            int progress = 0;
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                mediaPlayer.seekTo(progress);
+                mediaPlayer.start();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                mediaPlayer.pause();
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    this.progress = progress;
+                }
+            }
+        });
         handler.postDelayed(updateTime, 100);
 
 
@@ -73,13 +94,12 @@ public class WhispPlayerFragment extends DialogFragment {
             public void onClick(View v) {
 
                 if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-
                     mediaPlayer.stop();
                     mediaPlayer.release();
                     handler.removeCallbacks(updateTime);
                 }
 
-                mediaPlayer = MediaPlayer.create(getContext(), recordedWhispUri);
+                mediaPlayer = MediaPlayer.create(getContext(), whispUri);
                 mediaPlayer.start();
                 whispSeekBar.setProgress(mediaPlayer.getCurrentPosition());
                 handler.postDelayed(updateTime, 100);
@@ -94,7 +114,6 @@ public class WhispPlayerFragment extends DialogFragment {
     public void onDismiss(DialogInterface dialog) {
         mediaPlayer.stop();
         mediaPlayer.release();
-
         handler.removeCallbacks(updateTime);
 
         super.onDismiss(dialog);

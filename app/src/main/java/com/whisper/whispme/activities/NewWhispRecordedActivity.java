@@ -1,7 +1,9 @@
 package com.whisper.whispme.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -18,10 +20,23 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.whisper.whispme.R;
 import com.whisper.whispme.fragments.WhispPlayerFragment;
+import com.whisper.whispme.fragments.WhispsFragment;
+import com.whisper.whispme.helpers.UUIDGeneratorHelper;
+import com.whisper.whispme.models.Whisp;
+import com.whisper.whispme.network.WhispmeApi;
+import com.whisper.whispme.network.WhispmeApiInterface;
 
+import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class NewWhispRecordedActivity extends AppCompatActivity {
 
@@ -29,6 +44,7 @@ public class NewWhispRecordedActivity extends AppCompatActivity {
     Button playWhispButton;
     TextInputEditText whispTitleInputEditText;
 
+    WhispmeApi whispmeApi;
 
     private ProgressDialog mProgress;
 
@@ -58,6 +74,22 @@ public class NewWhispRecordedActivity extends AppCompatActivity {
                 // TODO Create whisp
                 // TODO Upload whisp to server
 
+                uploadWhisp();
+
+            }
+        });
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+        whispmeApi = new WhispmeApi();
+        whispmeApi.uploadWhispListener = new WhispmeApiInterface.UploadWhispListener() {
+            @Override
+            public void onEventCompleted(String apiResponse) {
+                mProgress.dismiss();
+
+                Toast.makeText(getApplicationContext(),
+                        apiResponse,
+                        Toast.LENGTH_SHORT).show();
 
                 Intent intent = new Intent(
                         NewWhispRecordedActivity.this,
@@ -67,28 +99,62 @@ public class NewWhispRecordedActivity extends AppCompatActivity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivity(intent);
                 finish();
-
             }
-        });
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            @Override
+            public void onEventFailed(String apiResponse) {
+                Toast.makeText(getApplicationContext(),
+                        apiResponse,
+                        Toast.LENGTH_SHORT).show();
+            }
+        };
 
 
         mProgress = new ProgressDialog(this);
     }
 
 
+    // TODO upload whisp to server
+    private void uploadWhisp() {
 
-    /*private void uploadWhisp() {
-
-        mProgress.setMessage("Uploading audio...");
+        mProgress.setMessage("Creating your whisp!");
         mProgress.show();
 
-        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        StorageReference mStorage = FirebaseStorage.getInstance().getReference();
 
-        String audioName = dateFormat.format(new Date());
+        final String audioName = UUIDGeneratorHelper.generateId();
+        StorageReference filepath = mStorage.child("whisps_audios").child(audioName + ".mp3");
 
-        // TODO upload whisp to server
+        Uri recordedWhispUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory()
+                .getPath() + "/recorded_whisp.mp3"));
 
-    }*/
+        filepath.putFile(recordedWhispUri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
+                        SharedPreferences prefs =
+                                getSharedPreferences("WhispmeSP", Context.MODE_PRIVATE);
+                        int userId = prefs.getInt(getString(R.string.sp_user_id), 0);
+
+                        Toast.makeText(NewWhispRecordedActivity.this,
+                                String.valueOf(userId),
+                                Toast.LENGTH_LONG).show();
+
+                        Whisp whisp = new Whisp();
+                        whisp.setUserId(userId)
+                                .setUrlAudio(audioName)
+                                .setTitle("title")
+                                .setDescription("description")
+                                .setUrlPhoto("urlPhoto")
+                                .setDateCreation(new Date())
+                                .setLatitude(WhispsFragment.LATITUDE)
+                                .setLongitude(WhispsFragment.LONGITUDE)
+                                .setPlace("place");
+
+                        whispmeApi.uploadWhisp(whisp);
+                    }
+                });
+
+    }
 }

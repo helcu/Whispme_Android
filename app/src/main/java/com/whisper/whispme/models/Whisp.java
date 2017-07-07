@@ -4,6 +4,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -132,47 +134,63 @@ public class Whisp {
     }
 
 
-
-
-    /*
     public static Whisp build(JSONObject jsonSource) {
         Whisp whisp = new Whisp();
         try {
-            List<String> sortBysAvailable = new ArrayList<>();
-            for(int i = 0; i < jsonSource.getJSONArray("sortBysAvailable").length(); i++ ) {
-                sortBysAvailable.add(jsonSource.getJSONArray("sortBysAvailable").getString(i));
-            }
-            String url = jsonSource.getString("url");
-            Map<String, String> urlsToLogos = ClearbitLogoApi.getUrlsToLogosFor(url);
-            whisp.setId(jsonSource.getString("id"))
-                    .setName(jsonSource.getString("name"))
+            whisp.setWhispId(jsonSource.getInt("whispId"))
+                    .setUserId(jsonSource.getInt("UserId"))
+                    .setUrlAudio(jsonSource.getString("urlAudio"))
+                    .setTitle(jsonSource.getString("title"))
                     .setDescription(jsonSource.getString("description"))
-                    .setUrl(jsonSource.getString("url"))
-                    .setCategory(jsonSource.getString("category"))
-                    .setLanguage(jsonSource.getString("language"))
-                    .setCountry(jsonSource.getString("country"))
-                    .setSortBysAvailable(sortBysAvailable)
-                    .setUrlsToLogos(urlsToLogos);
+                    .setUrlPhoto(jsonSource.getString("urlPhoto"))
+                    .setDateCreation((new SimpleDateFormat("dd-MMM-yyyy"))
+                            .parse(jsonSource.getString("dateCreation")))
+                    .setLatitude(Float.parseFloat(jsonSource.getString("latitude")))
+                    .setLongitude(Float.parseFloat(jsonSource.getString("longitude")))
+                    .setPlace(jsonSource.getString("place"));
             return whisp;
-        } catch (JSONException e) {
+        } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
     public static List<Whisp> build(JSONArray jsonSources) {
         List<Whisp> whisps = new ArrayList<>();
-        for(int i = 0; i < jsonSources.length(); i++)
+        for (int i = 0; i < jsonSources.length(); i++)
             try {
-                whisps.add(Whisp.build(jsonSources.getJSONObject(i)));
+                whisps.add(build(jsonSources.getJSONObject(i)));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         return whisps;
     }
-    */
 
 
+    public static Whisp buildNearWhisps(JSONObject jsonSource) {
+        Whisp whisp = new Whisp();
+        try {
+            return whisp.setWhispId(jsonSource.getInt("IdWhisp"))
+                    .setLatitude(Float.parseFloat(jsonSource.getString("Latitude")))
+                    .setLongitude(Float.parseFloat(jsonSource.getString("Longitude")));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
+        return null;
+    }
+
+    public static List<Whisp> buildNearWhisps(JSONArray jsonSources) {
+        List<Whisp> whisps = new ArrayList<>();
+        for (int i = 0; i < jsonSources.length(); i++) {
+            try {
+                whisps.add(buildNearWhisps(jsonSources.getJSONObject(i)));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return whisps;
+    }
 
 }
